@@ -43,3 +43,4 @@ venv.bak/
 *.db-journal
 .DS_Store
 Thumbs.db
+backend/database/*.db
