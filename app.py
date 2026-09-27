@@ -18,8 +18,13 @@ from backend.app import app, initialize_application
 from backend.config import HOST, PORT, DEBUG, IS_VERCEL
 
 
+
 if IS_VERCEL:
-    initialize_application()
+    try:
+        initialize_application()
+    except Exception as e:
+        import logging
+        logging.getLogger("SpaceGuardAI").warning(f"Vercel warm-up initialization warning: {e}")
 
 if __name__ == "__main__":
 

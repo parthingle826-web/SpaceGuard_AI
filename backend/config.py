@@ -11,19 +11,20 @@ from pathlib import Path
 IS_VERCEL = bool(os.environ.get("VERCEL"))
 
 
+
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
-DATA_DIR = BACKEND_DIR / "data"
-MODELS_DIR = BACKEND_DIR / "models"
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
-SCHEMA_FILE_PATH = BACKEND_DIR / "database" / "schema.sql"
+MODELS_DIR = PROJECT_ROOT / "backend" / "models"
+DATA_DIR = PROJECT_ROOT / "backend" / "data"
+SCHEMA_FILE_PATH = PROJECT_ROOT / "backend" / "database" / "schema.sql"
 
 
 if IS_VERCEL:
     DATABASE_DIR = Path("/tmp")
     DATABASE_PATH = DATABASE_DIR / "spaceguard.db"
 else:
-    DATABASE_DIR = BACKEND_DIR / "database"
+    DATABASE_DIR = PROJECT_ROOT / "backend" / "database"
     DATABASE_PATH = DATABASE_DIR / "spaceguard.db"
 
 
@@ -77,7 +78,7 @@ NOMINAL_RANGES = {
     "radiation_level": {"min": 0.01, "nominal": 0.05, "max": 0.30, "unit": "rad/s"}
 }
 
-# Anomaly Classes
+
 ANOMALY_CLASSES = [
     "Normal",
     "Temperature spike",
