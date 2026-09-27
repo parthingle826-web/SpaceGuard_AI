@@ -53,21 +53,19 @@ from backend.ml.predict import (
 )
 from backend.ml.evaluate import evaluate_models
 
-# Setup logging
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s - %(message)s"
 )
 logger = logging.getLogger("SpaceGuardAI")
 
-# Initialize Flask App
+
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 app = Flask(__name__, static_folder=str(FRONTEND_DIR), static_url_path="")
 CORS(app)
 
-# =========================================================================
-# REAL-TIME SATELLITE TELEMETRY SIMULATION CONTROLLER
-# =========================================================================
+
 class SatelliteSimulationController:
     """
     Simulates real-time LEO orbit telemetry stream with periodic anomaly injection.
@@ -85,7 +83,7 @@ class SatelliteSimulationController:
         self.last_tick_time = 0.0
         self.lock = threading.Lock()
         
-        # State tracking
+       
         self.current_state = {
             "satellite_id": "SG-ALPHA-1",
             "orbital_altitude_km": 540.2,
@@ -120,7 +118,7 @@ class SatelliteSimulationController:
         is_sunlit = 1 if sun_exposure > -0.15 else 0
         orbit_mode = "Sunlit Pass" if is_sunlit else "Eclipse Pass"
 
-        # Baseline physics
+        
         solar_v = round(max(0.0, 48.0 * is_sunlit + random.gauss(0, 0.8)), 2)
         solar_i = round(max(0.0, 6.4 * is_sunlit + random.gauss(0, 0.25)), 3)
         bat_v = round(27.4 + 2.0 * math.sin(self.orbit_phase_rad) + random.gauss(0, 0.2), 3)
@@ -148,12 +146,12 @@ class SatelliteSimulationController:
             "radiation_level": radiation
         }
 
-        # Check for forced or spontaneous anomaly injection
+       
         inject_type = None
         if self.forced_anomaly:
             inject_type = self.forced_anomaly
             self.forced_anomaly = None
-        elif random.random() < 0.16:  # 16% spontaneous anomaly tick
+        elif random.random() < 0.16:  
             inject_type = random.choice([
                 "Temperature spike",
                 "Battery voltage drop",
@@ -164,7 +162,7 @@ class SatelliteSimulationController:
                 "Multiple simultaneous abnormalities"
             ])
 
-        # Apply injection modifications
+       
         if inject_type == "Temperature spike":
             point["temperature"] += round(random.uniform(32.0, 48.0), 2)
             point["cpu_subsystem_temp"] += round(random.uniform(25.0, 40.0), 2)
@@ -196,7 +194,7 @@ class SatelliteSimulationController:
             try:
                 point, orbit_mode = self.generate_simulated_point()
                 
-                # Run inference using the active ML model
+                
                 pred_result = predict_single_telemetry(point, model_name=self.active_model)
                 
                 status = pred_result["status"]
@@ -204,7 +202,7 @@ class SatelliteSimulationController:
                 anom_type = pred_result["anomaly_type"]
                 confidence = pred_result["confidence"]
                 
-                # Log telemetry to stream
+                
                 point["is_anomaly"] = 1 if status == "Anomaly" else 0
                 point["anomaly_type"] = anom_type
                 try:
@@ -212,7 +210,7 @@ class SatelliteSimulationController:
                 except Exception as e:
                     logger.debug(f"Telemetry point log error: {e}")
                 
-                # If anomaly detected, log to anomaly_history
+               
                 if status == "Anomaly":
                     try:
                         log_anomaly_record(
@@ -230,7 +228,7 @@ class SatelliteSimulationController:
                     except Exception as e:
                         logger.debug(f"Anomaly record log error: {e}")
                 
-                # Update alert message
+               
                 if severity == "Critical":
                     alert_msg = f"CRITICAL: {anom_type.upper()} detected. Telemetry indicates severe subsystem departure."
                 elif severity == "Warning":
@@ -238,7 +236,7 @@ class SatelliteSimulationController:
                 else:
                     alert_msg = "Satellite telemetry is within expected range."
 
-                # Update in-memory state
+               
                 self.current_state.update({
                     "orbit_phase": orbit_mode,
                     "status": status,
@@ -311,9 +309,7 @@ class SatelliteSimulationController:
 
 simulation_controller = SatelliteSimulationController()
 
-# =========================================================================
-# CENTRALIZED ERROR HANDLERS
-# =========================================================================
+
 @app.errorhandler(400)
 def bad_request(error):
     return jsonify({
@@ -339,9 +335,6 @@ def internal_error(error):
         "message": "An internal server error occurred while processing the request."
     }), 500
 
-# =========================================================================
-# PAGE ROUTING (Serves frontend static views)
-# =========================================================================
 @app.route("/favicon.ico")
 def favicon():
     """Serves a dynamic SVG satellite favicon to prevent browser 404 errors."""
@@ -389,16 +382,12 @@ def history_page():
 def about_page():
     return send_from_directory(FRONTEND_DIR, "about.html")
 
-# =========================================================================
-# REST API ENDPOINTS
-# =========================================================================
 
 @app.route("/api/health", methods=["GET"])
 def get_health():
     """Returns current satellite telemetry snapshot, health score, and subsystem ratings."""
     state = simulation_controller.get_status()
     
-    # Calculate health score dynamically from recent telemetry stream
     health_score = 98.5
     try:
         with get_db_connection() as conn:
@@ -413,7 +402,7 @@ def get_health():
     except Exception as e:
         logger.debug(f"Health query fallback: {e}")
 
-    # Subsystem ratings
+
     tel = state["telemetry"]
     subsystems = {
         "EPS": "Optimal" if 24.5 <= tel.get("battery_voltage", 28) <= 31.0 and tel.get("battery_current", 3) < 8.0 else ("Warning" if tel.get("battery_voltage", 28) > 22.0 else "Critical"),
@@ -447,13 +436,13 @@ def get_dashboard_stats():
         with get_db_connection() as conn:
             cursor = conn.cursor()
             
-            # Telemetry stream counts
+           
             cursor.execute("SELECT COUNT(*) as total, SUM(is_anomaly) as anomalies FROM telemetry_stream")
             stream_row = cursor.fetchone()
             total_stream = stream_row["total"] or 0
             total_anomalies_stream = stream_row["anomalies"] or 0
             
-            # Anomaly history counts
+       
             cursor.execute("SELECT COUNT(*) as total FROM anomaly_history")
             history_count = cursor.fetchone()["total"]
             
@@ -527,11 +516,11 @@ def get_telemetry():
         with get_db_connection() as conn:
             cursor = conn.cursor()
             
-            # Total count
+           
             cursor.execute(f"SELECT COUNT(*) as total FROM telemetry_stream {where_clause}", params)
             total = cursor.fetchone()["total"]
             
-            # Select records
+           
             query = f"""
                 SELECT * FROM telemetry_stream
                 {where_clause}
@@ -571,7 +560,7 @@ def predict():
     """
     model_name = request.args.get("model", "XGBoost")
     
-    # Handle CSV File Batch Upload
+ 
     if "file" in request.files:
         file = request.files["file"]
         if not file.filename.endswith(".csv"):
@@ -588,12 +577,12 @@ def predict():
                 
             pred_df = predict_batch_telemetry(df, model_name=model_name)
             
-            # Anomaly summary
+           
             anom_counts = pred_df["predicted_type"].value_counts().to_dict()
             total_rows = len(pred_df)
             anom_total = int((pred_df["predicted_status"] == "Anomaly").sum())
             
-            # Sample preview
+          
             preview = pred_df.head(25).to_dict(orient="records")
             
             return jsonify({
@@ -611,7 +600,7 @@ def predict():
             logger.error(f"Error processing CSV prediction: {e}")
             return jsonify({"status": "error", "message": f"Failed to parse CSV: {str(e)}"}), 400
 
-    # Handle JSON Single Record
+   
     data = request.get_json(silent=True)
     if not data:
         return jsonify({"status": "error", "message": "No JSON payload or CSV file provided."}), 400
@@ -620,7 +609,7 @@ def predict():
     requested_model = data.get("model_name", model_name)
     log_to_history = data.get("log_to_history", True)
 
-    # Validate presence of required features with graceful defaults
+   
     validated_telemetry = {}
     for feat in TELEMETRY_FEATURES:
         if feat in telemetry:
@@ -629,13 +618,13 @@ def predict():
             except (ValueError, TypeError):
                 return jsonify({"status": "error", "message": f"Invalid numerical value for field: {feat}"}), 400
         else:
-            # Fallback to nominal default
+           
             validated_telemetry[feat] = NOMINAL_RANGES[feat]["nominal"]
 
     try:
         result = predict_single_telemetry(validated_telemetry, model_name=requested_model)
         
-        # Log to SQLite history if requested
+        
         if log_to_history:
             log_anomaly_record(
                 telemetry_snapshot=validated_telemetry,
@@ -720,7 +709,7 @@ def upload_dataset():
                 "message": f"CSV is missing required telemetry columns: {', '.join(missing)}"
             }), 400
 
-        # Ingest records into database telemetry stream via high-performance batch insert
+        
         records = df.to_dict(orient="records")
         ingested = log_telemetry_batch(records)
 
@@ -794,19 +783,17 @@ def set_active_model():
         "active_model": model_name
     })
 
-# =========================================================================
-# APPLICATION ENTRYPOINT
-# =========================================================================
+
 def initialize_application():
     """Initializes database schema, seeds initial telemetry data, and sets simulation mode."""
     init_db()
     seed_telemetry_if_empty(seed_limit=150)
     seed_demo_anomalies_if_empty()
     if not IS_VERCEL:
-        # Start continuous simulation loop in local development
+      
         simulation_controller.start()
     else:
-        # In Vercel serverless mode, prime telemetry state on-demand without background thread
+       
         simulation_controller.is_running = True
         simulation_controller.tick_simulation()
     logger.info(f"SpaceGuard AI initialized successfully (Serverless: {IS_VERCEL}).")

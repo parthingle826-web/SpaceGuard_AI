@@ -519,11 +519,11 @@
         renderRecentAnomalies(hist.data.records);
       }
 
-      // Refresh charts
+
       await updateChartsData();
     }
 
-    // Render Recent Anomalies
+
     function renderRecentAnomalies(records) {
       const tbody = document.getElementById('recentAnomaliesTableBody');
       if (!tbody) return;
@@ -547,7 +547,7 @@
       `).join('');
     }
 
-    // Toggle Simulation
+
     async function toggleSimulation() {
       if (isSimRunning) {
         await SpaceGuardAPI.stopSimulation();
@@ -574,14 +574,13 @@
       }
     }
 
-    // Trigger Anomaly
+ 
     async function triggerAnomaly(type) {
       await SpaceGuardAPI.injectAnomaly(type);
       const alertMsg = document.getElementById('alertMessageText');
       if (alertMsg) alertMsg.textContent = `Injecting anomaly '${type}' on next simulation tick...`;
     }
 
-    // Select Active Model
     async function selectActiveModel(name) {
       activeModel = name;
       await SpaceGuardAPI.setActiveModel(name);
