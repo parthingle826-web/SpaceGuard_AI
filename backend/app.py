@@ -44,6 +44,7 @@ from backend.database.db import (
     get_anomaly_history,
     clear_anomaly_history,
     log_telemetry_point,
+    log_telemetry_batch,
     get_recent_telemetry,
     get_db_connection
 )
@@ -667,12 +668,9 @@ def upload_dataset():
                 "message": f"CSV is missing required telemetry columns: {', '.join(missing)}"
             }), 400
 
-        # Ingest records into database telemetry stream
-        ingested = 0
-        for _, row in df.iterrows():
-            record = row.to_dict()
-            log_telemetry_point(record)
-            ingested += 1
+        # Ingest records into database telemetry stream via high-performance batch insert
+        records = df.to_dict(orient="records")
+        ingested = log_telemetry_batch(records)
 
         return jsonify({
             "status": "success",

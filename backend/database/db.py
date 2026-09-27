@@ -172,6 +172,43 @@ def log_telemetry_point(record: Dict[str, Any]) -> int:
         conn.commit()
         return cursor.lastrowid
 
+def log_telemetry_batch(records: List[Dict[str, Any]]) -> int:
+    """Inserts a batch of telemetry observations inside a single transaction."""
+    if not records:
+        return 0
+    query = """
+        INSERT INTO telemetry_stream (
+            timestamp, battery_voltage, battery_current, temperature,
+            pressure, solar_panel_voltage, solar_panel_current,
+            power_consumption, cpu_subsystem_temp, signal_strength,
+            comm_status, radiation_level, is_anomaly, anomaly_type
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    rows = []
+    now_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    for r in records:
+        rows.append((
+            r.get("timestamp") or now_str,
+            float(r.get("battery_voltage", 28.0)),
+            float(r.get("battery_current", 3.5)),
+            float(r.get("temperature", 22.0)),
+            float(r.get("pressure", 101.3)),
+            float(r.get("solar_panel_voltage", 48.0)),
+            float(r.get("solar_panel_current", 6.5)),
+            float(r.get("power_consumption", 200.0)),
+            float(r.get("cpu_subsystem_temp", 38.0)),
+            float(r.get("signal_strength", -75.0)),
+            int(r.get("comm_status", 1)),
+            float(r.get("radiation_level", 0.05)),
+            int(r.get("is_anomaly", 0)),
+            str(r.get("anomaly_type", "Normal"))
+        ))
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.executemany(query, rows)
+        conn.commit()
+    return len(rows)
+
 def get_recent_telemetry(limit: int = 50) -> List[Dict[str, Any]]:
     """Retrieves recent telemetry stream records ordered by time."""
     query = """
