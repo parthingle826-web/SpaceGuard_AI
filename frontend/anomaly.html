@@ -481,7 +481,7 @@
       document.getElementById('resultConfidenceText').textContent = `${(r.confidence * 100).toFixed(1)}%`;
       document.getElementById('resultExplanationText').textContent = r.explanation;
 
-      // Contributing Features
+      
       const featContainer = document.getElementById('contributingFeaturesContainer');
       const featBars = document.getElementById('contributingFeaturesBars');
 
@@ -506,7 +506,7 @@
         featContainer.style.display = 'none';
       }
 
-      // Decision Support
+      
       const ds = r.decision_support;
       if (ds) {
         document.getElementById('decisionSupportTitle').textContent = ds.summary || 'Advisory Protocol:';
