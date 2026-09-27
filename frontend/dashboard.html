@@ -12,14 +12,13 @@
 </head>
 <body>
 
-  <!-- Academic Disclaimer Banner -->
   <div class="academic-disclaimer-banner">
     <i class="fa-solid fa-triangle-exclamation me-1"></i>
     <strong>ACADEMIC SIMULATION:</strong> All displayed telemetry values and alerts are generated for educational demonstration and are <strong>NOT real NASA or operational spacecraft data</strong>.
   </div>
 
   <div class="app-container">
-    <!-- Sidebar Navigation -->
+   
     <aside class="sidebar">
       <div class="sidebar-brand">
         <div class="sidebar-logo-icon">
@@ -76,9 +75,9 @@
       </div>
     </aside>
 
-    <!-- Main Wrapper -->
+    
     <div class="main-wrapper">
-      <!-- Topbar -->
+      
       <header class="topbar">
         <div class="d-flex align-items-center gap-3">
           <h2 class="topbar-title">MISSION CONTROL CENTER</h2>
@@ -86,7 +85,7 @@
             <i class="fa-solid fa-sun me-1 text-warning"></i> Sunlit Pass (LEO)
           </span>
         </div>
-        <!-- Simulation Controls & Injector -->
+        
         <div class="d-flex align-items-center gap-2 flex-wrap">
           <div class="dropdown">
             <button class="btn btn-space-outline btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -122,9 +121,9 @@
         </div>
       </header>
 
-      <!-- Content Body -->
+      
       <main class="content-body">
-        <!-- Live Alert Banner -->
+       
         <div id="missionAlertBanner" class="mission-alert-banner alert-state-normal">
           <div id="alertIconBox">
             <i class="fa-solid fa-shield-halved fs-3 text-success"></i>
@@ -142,7 +141,6 @@
           </div>
         </div>
 
-        <!-- KPI Stat Cards Row -->
         <div class="row g-3 mb-4">
           <div class="col-sm-6 col-xl-3">
             <div class="kpi-card">
@@ -189,7 +187,7 @@
           </div>
         </div>
 
-        <!-- Subsystem Health Chip Grid -->
+        
         <div class="space-card mb-4">
           <div class="card-header-styled">
             <h3 class="card-title-styled">
@@ -221,9 +219,9 @@
           </div>
         </div>
 
-        <!-- Telemetry Live Graphs (3 Charts) -->
+       
         <div class="row g-4 mb-4">
-          <!-- Chart 1: Battery Subsystem -->
+        
           <div class="col-lg-6">
             <div class="space-card h-100">
               <div class="card-header-styled">
@@ -238,7 +236,7 @@
             </div>
           </div>
 
-          <!-- Chart 2: Thermal Subsystem -->
+          
           <div class="col-lg-6">
             <div class="space-card h-100">
               <div class="card-header-styled">
@@ -253,7 +251,7 @@
             </div>
           </div>
 
-          <!-- Chart 3: Power & Generation -->
+          
           <div class="col-lg-12">
             <div class="space-card">
               <div class="card-header-styled">
@@ -269,7 +267,7 @@
           </div>
         </div>
 
-        <!-- Decision Support Live Advisory Box (Appears when anomaly detected) -->
+        
         <div id="liveDecisionSupportContainer" class="mb-4" style="display: none;">
           <div class="decision-support-box">
             <div class="d-flex align-items-center justify-content-between mb-2">
@@ -280,7 +278,7 @@
             </div>
             <h4 class="h6 text-light mb-2" id="liveDecisionSummary">Subsystem requires flight controller review.</h4>
             <div id="liveDecisionActionsList" class="mb-3">
-              <!-- Dynamically populated -->
+
             </div>
             <div class="small text-secondary" style="font-size: 0.72rem;">
               <i class="fa-solid fa-circle-info me-1"></i>
@@ -289,7 +287,7 @@
           </div>
         </div>
 
-        <!-- Recent Anomaly Log Table -->
+        
         <div class="space-card">
           <div class="card-header-styled">
             <h3 class="card-title-styled">
@@ -323,7 +321,7 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script src="/js/api.js"></script>
@@ -333,9 +331,9 @@
     let activeModel = 'XGBoost';
     let chartBattery, chartThermal, chartPower;
 
-    // Initialize Dashboard Charts
+
     function initDashboardCharts() {
-      // 1. Battery Chart (Voltage)
+
       chartBattery = SpaceGuardCharts.createTelemetryChart(
         'chartBattery',
         'Battery Voltage',
@@ -344,7 +342,7 @@
         'V'
       );
 
-      // 2. Thermal Chart (Chassis & CPU)
+      
       const thermalCtx = document.getElementById('chartThermal');
       if (thermalCtx) {
         const options = SpaceGuardCharts.getDefaultOptions('Thermal Telemetry', true);
@@ -379,7 +377,7 @@
         });
       }
 
-      // 3. Power Chart
+      
       chartPower = SpaceGuardCharts.createTelemetryChart(
         'chartPower',
         'Power Consumption',
@@ -389,7 +387,7 @@
       );
     }
 
-    // Update Telemetry Charts with latest stream
+   
     async function updateChartsData() {
       const res = await SpaceGuardAPI.getTelemetry({ limit: 30 });
       if (res.status !== 'success' || !res.records || res.records.length === 0) return;
@@ -404,7 +402,7 @@
         chartBattery.update('none');
       }
 
-      // Thermal
+      
       if (chartThermal) {
         chartThermal.data.labels = labels;
         chartThermal.data.datasets[0].data = records.map(r => r.temperature);
@@ -412,7 +410,7 @@
         chartThermal.update('none');
       }
 
-      // Power
+
       if (chartPower) {
         chartPower.data.labels = labels;
         chartPower.data.datasets[0].data = records.map(r => r.power_consumption);
@@ -420,7 +418,6 @@
       }
     }
 
-    // Poll Health & KPI Stats
     async function pollDashboard() {
       const [health, stats, hist] = await Promise.all([
         SpaceGuardAPI.getHealth(),
@@ -429,7 +426,7 @@
       ]);
 
       if (health) {
-        // Orbit mode
+
         const modeBadge = document.getElementById('orbitModeBadge');
         if (modeBadge) {
           const isSun = health.orbit_phase && health.orbit_phase.includes('Sun');
@@ -438,7 +435,7 @@
             : '<i class="fa-solid fa-moon me-1 text-info"></i> Eclipse Pass (LEO)';
         }
 
-        // Live badge readouts
+
         const tel = health.telemetry || {};
         if (tel.battery_voltage !== undefined) {
           document.getElementById('liveBatVolts').textContent = `${tel.battery_voltage} V`;
@@ -446,7 +443,7 @@
           document.getElementById('livePower').textContent = `${tel.power_consumption} W`;
         }
 
-        // Alert Banner
+
         const alertBanner = document.getElementById('missionAlertBanner');
         const alertLabel = document.getElementById('alertSeverityLabel');
         const alertMsg = document.getElementById('alertMessageText');
@@ -473,7 +470,7 @@
           alertIconBox.innerHTML = '<i class="fa-solid fa-shield-halved fs-3 text-success"></i>';
         }
 
-        // Subsystem Matrix Chips
+
         const subs = health.subsystems || {};
         for (const [sub, state] of Object.entries(subs)) {
           const statusEl = document.getElementById(`status${sub}`);
@@ -483,13 +480,13 @@
           }
         }
 
-        // Live Decision Support Display
+
         const dsBox = document.getElementById('liveDecisionSupportContainer');
         if (health.satellite_status === 'Anomaly' && health.anomaly_type !== 'Normal') {
           dsBox.style.display = 'block';
           document.getElementById('liveAnomTypeBadge').textContent = `${health.severity}: ${health.anomaly_type}`;
           
-          // Get decision rules
+
           const actionsList = document.getElementById('liveDecisionActionsList');
           if (health.decision_support && health.decision_support.actions) {
             document.getElementById('liveDecisionSummary').textContent = health.decision_support.summary || 'Investigate telemetry divergence.';
@@ -504,7 +501,7 @@
           dsBox.style.display = 'none';
         }
 
-        // Sim running state
+
         isSimRunning = health.simulation_running;
         updateSimButtonState();
       }
