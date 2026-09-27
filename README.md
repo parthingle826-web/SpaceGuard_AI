@@ -35,7 +35,10 @@ SpaceGuard AI is a full-stack, runnable academic mini-project designed to detect
 
 ## 3. Folder Structure
 ```
-AIML_Mini_Project/
+SpaceGuard_AI/
+├── app.py                         # Root Flask entrypoint (for Vercel serverless & local execution)
+├── requirements.txt               # Root dependencies for deployment
+├── vercel.json                    # Modern Vercel configuration for routing & bundling
 ├── backend/
 │   ├── app.py                     # Main Flask web application & REST API routes
 │   ├── config.py                  # System configuration, paths, nominal ranges, rules
@@ -49,7 +52,7 @@ AIML_Mini_Project/
 │   ├── data/                      # Raw & processed CSV telemetry datasets
 │   └── database/
 │       ├── schema.sql             # SQLite schema (anomaly_history & telemetry_stream)
-│       ├── db.py                  # Database queries and telemetry seed helper
+│       ├── db.py                  # Database queries, serverless fallback & seeding
 │       └── spaceguard.db          # SQLite database file
 ├── frontend/
 │   ├── index.html                 # Mission Overview (Landing Page)
@@ -67,7 +70,9 @@ AIML_Mini_Project/
 ├── notebooks/
 │   └── eda_and_training.ipynb     # Exploratory Data Analysis & training notebook
 ├── scripts/
-│   └── generate_dataset.py        # Synthetic physics-grounded telemetry generator
+│   ├── generate_dataset.py        # Synthetic physics-grounded telemetry generator
+│   ├── test_end_to_end.py         # End-to-end DOM, routes & API test suite
+│   └── verify_all_features.py     # 9-subsystem comprehensive verification suite
 ├── screenshots/                   # Application screenshots
 ├── docs/
 │   ├── research_paper.md          # IEEE-style research paper and technical report
@@ -130,31 +135,41 @@ All three models were trained and evaluated on an identical stratified split (5,
 
 ---
 
-## 7. Installation & Quick Start (Windows)
+## 7. Installation & Local Development (Windows / Linux / macOS)
 
 ### 1. Clone or Open Workspace
-```powershell
-cd "d:\AIML_Mini_Project ( SpaceGuard AI)"
+```bash
+git clone <repo_url>
+cd SpaceGuard_AI
 ```
 
 ### 2. Create Virtual Environment & Install Dependencies
-```powershell
+```bash
+# Windows (PowerShell)
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
+
+# Linux / macOS
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-### 3. Generate Data & Train Models
-```powershell
+### 3. Generate Data & Train Models (Already Pre-trained)
+The repository includes pre-generated synthetic datasets and trained `.joblib` model artifacts. To re-train from scratch:
+```bash
 python scripts/generate_dataset.py
 python backend/ml/preprocess.py
 python backend/ml/train_models.py
 python backend/ml/evaluate.py
 ```
 
-### 4. Start Flask Server
-```powershell
-python backend/app.py
+### 4. Start Local Flask Server
+You can launch the server either from the repository root or from `backend/`:
+```bash
+python app.py
+# Alternatively: python backend/app.py
 ```
 
 ### 5. Open in Web Browser
@@ -163,7 +178,56 @@ Open your browser and navigate to:
 
 ---
 
-## 8. Academic Citation & IEEE References
+## 8. Deploying SpaceGuard AI to Vercel
+
+SpaceGuard AI is configured for unified, zero-configuration Python Serverless deployment on Vercel.
+
+### Architecture for Serverless Deployment
+1. **Root Entrypoint (`app.py`):** Exposes the Flask `app` WSGI instance at the repository root. Vercel automatically detects `app.py` and routes incoming requests through the Python Serverless Runtime.
+2. **Root Dependencies (`requirements.txt`):** Specifies required packages (`Flask`, `scikit-learn`, `xgboost`, `pandas`, `numpy`, etc.) for Vercel's automated build container.
+3. **Modern Vercel Routing (`vercel.json`):**
+   ```json
+   {
+     "rewrites": [
+       {
+         "source": "/(.*)",
+         "destination": "/app.py"
+       }
+     ]
+   }
+   ```
+4. **Environment Detection (`IS_VERCEL`):**
+   - The application automatically detects `os.environ.get("VERCEL")`.
+   - **Local Mode:** Uses continuous background daemon threads for real-time telemetry simulation ticks and writes persistently to `backend/database/spaceguard.db`.
+   - **Vercel Serverless Mode:** Operates in a **request-driven on-demand simulation** model. No infinite background threads are spawned during module import or serverless invocation, preventing function timeouts or memory leaks.
+5. **Serverless-Safe Database & In-Memory Fallback:**
+   - Because the root filesystem is read-only in Vercel functions, SQLite writes are automatically redirected to `/tmp/spaceguard.db`.
+   - The database tables are automatically initialized and seeded with 150 nominal baseline rows and realistic sample anomaly incidents on cold start.
+   - In addition, an in-memory buffer mirrors all queries so that all endpoints (`/api/history`, `/api/telemetry`, etc.) remain fully functional even across ephemeral container instances.
+   - *Note:* In serverless environments, local database storage is ephemeral; incident history is guaranteed for the life of the function container but is not persistent across separate cold-start deployments.
+6. **Portable Frontend Paths:**
+   - Frontend assets and HTML templates resolve relative to the repository root.
+   - The frontend API client automatically binds to `window.location.origin`, ensuring all API requests seamlessly hit your Vercel deployment URL (`https://your-project.vercel.app/api/...`).
+
+### Deployment Steps
+
+#### Option A: Deploy via GitHub (Recommended)
+1. Push your repository to GitHub.
+2. Go to [vercel.com](https://vercel.com/) and click **"Add New Project"**.
+3. Import your `SpaceGuard_AI` repository.
+4. Keep the default settings (Framework Preset: **Other**, Root Directory: `./`).
+5. Click **"Deploy"**. Vercel will install dependencies from `requirements.txt` and launch the application.
+
+#### Option B: Deploy via Vercel CLI
+```bash
+npm install -g vercel
+vercel login
+vercel
+```
+
+---
+
+## 9. Academic Citation & IEEE References
 If referencing this project for academic coursework or mini-project reports:
 ```bibtex
 @misc{spaceguardai2026,
@@ -176,7 +240,7 @@ If referencing this project for academic coursework or mini-project reports:
 
 ---
 
-## 9. Future Scope
+## 10. Future Scope
 - Integration of unsupervised outlier detection (Isolation Forests and Autoencoders) for zero-day anomaly discovery.
 - Edge compilation to C/C++ or WebAssembly for deployment on spaceborne microcontrollers (ARM Cortex-M/R).
 - Benchmark validation against archival NASA SMAP/MSL publicly released telemetry data.

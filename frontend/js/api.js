@@ -1,17 +1,9 @@
-/**
- * SpaceGuard AI - API Client Library
- * Handles asynchronous communication with the Flask REST Backend.
- * NOTE: Academic simulation only - Not real NASA/spacecraft mission data.
- */
 
-const API_BASE = window.location.origin.includes('5000') 
-  ? window.location.origin 
-  : 'http://127.0.0.1:5000';
+
+const API_BASE = window.location.origin;
 
 const SpaceGuardAPI = {
-  /**
-   * Fetches real-time satellite health status and current telemetry snapshot.
-   */
+ 
   async getHealth() {
     try {
       const res = await fetch(`${API_BASE}/api/health`);
@@ -23,9 +15,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Fetches high-level dashboard KPIs, anomaly rate, and subsystem breakdown.
-   */
+
   async getDashboardStats() {
     try {
       const res = await fetch(`${API_BASE}/api/dashboard/stats`);
@@ -37,9 +27,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Fetches historical telemetry stream observations.
-   */
+ 
   async getTelemetry(params = {}) {
     const query = new URLSearchParams(params).toString();
     try {
@@ -52,9 +40,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Runs anomaly inference on single telemetry record.
-   */
+ 
   async predictSingle(telemetry, modelName = 'XGBoost', logToHistory = true) {
     try {
       const res = await fetch(`${API_BASE}/api/predict`, {
@@ -73,9 +59,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Runs batch prediction on uploaded CSV file.
-   */
+  
   async predictBatch(file, modelName = 'XGBoost') {
     const formData = new FormData();
     formData.append('file', file);
@@ -91,9 +75,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Fetches ML benchmark metrics, confusion matrices, and feature importances.
-   */
+ 
   async getModelPerformance() {
     try {
       const res = await fetch(`${API_BASE}/api/models/performance`);
@@ -105,9 +87,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Fetches logged anomaly history from SQLite database.
-   */
+  
   async getHistory(params = {}) {
     const query = new URLSearchParams(params).toString();
     try {
@@ -120,9 +100,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Clears anomaly history log in database.
-   */
+  
   async clearHistory() {
     try {
       const res = await fetch(`${API_BASE}/api/history/clear`, { method: 'POST' });
@@ -133,9 +111,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Uploads raw CSV telemetry to ingest into stream.
-   */
+  
   async uploadDataset(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -151,9 +127,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Starts real-time simulation background loop.
-   */
+
   async startSimulation() {
     try {
       const res = await fetch(`${API_BASE}/api/simulation/start`, { method: 'POST' });
@@ -164,9 +138,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Stops real-time simulation background loop.
-   */
+  
   async stopSimulation() {
     try {
       const res = await fetch(`${API_BASE}/api/simulation/stop`, { method: 'POST' });
@@ -177,9 +149,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Injects an anomaly mode into the live simulation tick.
-   */
+  
   async injectAnomaly(anomalyType) {
     try {
       const res = await fetch(`${API_BASE}/api/simulation/inject_anomaly`, {
@@ -194,9 +164,7 @@ const SpaceGuardAPI = {
     }
   },
 
-  /**
-   * Sets active ML model for live simulation inferences.
-   */
+  
   async setActiveModel(modelName) {
     try {
       const res = await fetch(`${API_BASE}/api/models/set_active`, {

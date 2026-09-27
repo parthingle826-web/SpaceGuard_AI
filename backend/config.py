@@ -7,34 +7,48 @@ NOTE: Academic simulation only - Not real NASA/spacecraft mission data.
 import os
 from pathlib import Path
 
-# Base Paths
+
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+
+
 BACKEND_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BACKEND_DIR.parent
 DATA_DIR = BACKEND_DIR / "data"
 MODELS_DIR = BACKEND_DIR / "models"
-DATABASE_DIR = BACKEND_DIR / "database"
+FRONTEND_DIR = PROJECT_ROOT / "frontend"
+SCHEMA_FILE_PATH = BACKEND_DIR / "database" / "schema.sql"
 
-# Ensure directories exist
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-MODELS_DIR.mkdir(parents=True, exist_ok=True)
-DATABASE_DIR.mkdir(parents=True, exist_ok=True)
 
-# Database path
-DATABASE_PATH = DATABASE_DIR / "spaceguard.db"
+if IS_VERCEL:
+    DATABASE_DIR = Path("/tmp")
+    DATABASE_PATH = DATABASE_DIR / "spaceguard.db"
+else:
+    DATABASE_DIR = BACKEND_DIR / "database"
+    DATABASE_PATH = DATABASE_DIR / "spaceguard.db"
 
-# Data file paths
+
+try:
+    if not IS_VERCEL:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        MODELS_DIR.mkdir(parents=True, exist_ok=True)
+        DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+    else:
+        DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
+
+
 RAW_DATASET_PATH = DATA_DIR / "satellite_telemetry_synthetic.csv"
 TRAIN_DATASET_PATH = DATA_DIR / "telemetry_train_processed.csv"
 TEST_DATASET_PATH = DATA_DIR / "telemetry_test_processed.csv"
 METRICS_PATH = MODELS_DIR / "metrics.json"
 
-# Server configuration
+
 PORT = int(os.environ.get("PORT", 5000))
 HOST = os.environ.get("HOST", "127.0.0.1")
 DEBUG = os.environ.get("FLASK_DEBUG", "True").lower() in ("true", "1")
 
-# Telemetry Feature Definitions with Nominal Ranges
-# Used for input validation, baseline comparison, and anomaly simulation
+
 TELEMETRY_FEATURES = [
     "battery_voltage",
     "battery_current",
@@ -75,11 +89,10 @@ ANOMALY_CLASSES = [
     "Multiple simultaneous abnormalities"
 ]
 
-# Severity definitions
+
 SEVERITY_LEVELS = ["Normal", "Warning", "Critical"]
 
-# Decision Support Rules (Rule-based recommendations)
-# Explicitly labeled as operator advisory / decision-support guidance
+
 DECISION_SUPPORT_RULES = {
     "Normal": {
         "summary": "Subsystem operating parameters within verified nominal thresholds.",
