@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anomaly Detection & Decision Support Lab – SpaceGuard AI</title>
+  <meta name="description" content="Simulate, classify, and diagnose spacecraft telemetry anomalies with ML models, feature explainability, and advisory decision-support rules.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Academic Disclaimer Banner -->
+  <div class="academic-disclaimer-banner">
+    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+    <strong>ACADEMIC SIMULATION:</strong> Decision-support actions are formulated for educational demonstration and operator review. They are <strong>NOT automated commands dispatched to a real spacecraft</strong>.
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo-icon">
+          <i class="fa-solid fa-satellite"></i>
+        </div>
+        <div>
+          <h1 class="sidebar-brand-title">SPACEGUARD</h1>
+          <p class="sidebar-brand-sub">AI TELEMETRY OPS</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="/" class="nav-link-item">
+          <i class="fa-solid fa-compass"></i>
+          <span>Mission Overview</span>
+        </a>
+        <a href="/dashboard" class="nav-link-item">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Mission Control</span>
+        </a>
+        <a href="/telemetry" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Telemetry Stream</span>
+        </a>
+        <a href="/anomaly" class="nav-link-item active">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Anomaly Lab</span>
+        </a>
+        <a href="/models" class="nav-link-item">
+          <i class="fa-solid fa-brain"></i>
+          <span>ML Model Benchmarks</span>
+        </a>
+        <a href="/history" class="nav-link-item">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Incident History</span>
+        </a>
+        <a href="/about" class="nav-link-item">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Architecture & Docs</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-status-box">
+          <div class="small text-secondary" style="font-size: 0.72rem;">INFERENCE MODE</div>
+          <div class="fw-bold text-info" style="font-size: 0.8rem;">Interactive Lab</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div>
+          <h2 class="topbar-title">ANOMALY DETECTION & DIAGNOSTIC LAB</h2>
+          <span class="small text-secondary">Inference Testing, Feature Explainability & Decision-Support Checklist</span>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <main class="content-body">
+        <!-- Scenario Presets Bar -->
+        <div class="space-card mb-4 py-3">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <span class="small text-secondary fw-bold text-uppercase" style="letter-spacing: 0.8px;">
+              <i class="fa-solid fa-wand-magic-sparkles text-info me-1"></i> Quick Test Scenarios:
+            </span>
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-space-outline btn-sm" onclick="loadScenario('nominal')">
+                <i class="fa-solid fa-check text-success me-1"></i> Nominal Pass
+              </button>
+              <button class="btn btn-space-outline btn-sm" onclick="loadScenario('thermal')">
+                <i class="fa-solid fa-fire text-danger me-1"></i> Thermal Runaway
+              </button>
+              <button class="btn btn-space-outline btn-sm" onclick="loadScenario('battery')">
+                <i class="fa-solid fa-car-battery text-warning me-1"></i> Battery Sag
+              </button>
+              <button class="btn btn-space-outline btn-sm" onclick="loadScenario('comm')">
+                <i class="fa-solid fa-tower-broadcast text-danger me-1"></i> Transponder Loss
+              </button>
+              <button class="btn btn-space-outline btn-sm" onclick="loadScenario('sensor')">
+                <i class="fa-solid fa-sliders text-warning me-1"></i> Pressure Drift
+              </button>
+              <button class="btn btn-space-outline btn-sm" onclick="loadScenario('solar_storm')">
+                <i class="fa-solid fa-sun text-danger me-1"></i> Solar Radiation Storm
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- Manual Input Form Column -->
+          <div class="col-lg-6">
+            <div class="space-card h-100">
+              <div class="card-header-styled">
+                <h3 class="card-title-styled">
+                  <i class="fa-solid fa-sliders text-info"></i> Ingest Telemetry Vector
+                </h3>
+                <!-- Model Picker -->
+                <div class="d-flex align-items-center gap-2">
+                  <label class="form-label-tech mb-0">Model:</label>
+                  <select class="form-select form-select-tech py-1 px-2" id="inferenceModelSelect" style="width: 140px; font-size: 0.8rem;">
+                    <option value="XGBoost" selected>XGBoost</option>
+                    <option value="SVM">SVM</option>
+                    <option value="Decision Tree">Decision Tree</option>
+                  </select>
+                </div>
+              </div>
+
+              <form id="anomalyPredictionForm" onsubmit="handleSinglePrediction(event)">
+                <div class="row g-3">
+                  <!-- Row 1: EPS -->
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Battery Voltage (V)</label>
+                    <input type="number" step="0.01" class="form-control form-control-tech val-mono" id="inputBatV" value="28.2" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 28.0V (24 - 32V)</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Battery Current (A)</label>
+                    <input type="number" step="0.01" class="form-control form-control-tech val-mono" id="inputBatI" value="3.5" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 3.5A (1 - 8A)</span>
+                  </div>
+
+                  <!-- Row 2: Thermal -->
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Chassis Temperature (°C)</label>
+                    <input type="number" step="0.1" class="form-control form-control-tech val-mono" id="inputTemp" value="22.0" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 22.0°C (-10 - 50°C)</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">CPU Subsystem Temp (°C)</label>
+                    <input type="number" step="0.1" class="form-control form-control-tech val-mono" id="inputCpuTemp" value="36.5" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 38.0°C (20 - 65°C)</span>
+                  </div>
+
+                  <!-- Row 3: Solar Array -->
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Solar Panel Voltage (V)</label>
+                    <input type="number" step="0.1" class="form-control form-control-tech val-mono" id="inputSolarV" value="48.0" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 48.0V (35 - 55V)</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Solar Panel Current (A)</label>
+                    <input type="number" step="0.01" class="form-control form-control-tech val-mono" id="inputSolarI" value="6.5" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 6.5A (2 - 9.5A)</span>
+                  </div>
+
+                  <!-- Row 4: Power & Pressure -->
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Power Consumption (W)</label>
+                    <input type="number" step="0.1" class="form-control form-control-tech val-mono" id="inputPower" value="195.0" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 200W (120 - 280W)</span>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label-tech">Avionics Pressure (kPa)</label>
+                    <input type="number" step="0.1" class="form-control form-control-tech val-mono" id="inputPressure" value="101.3" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: 101.3 kPa (85 - 105)</span>
+                  </div>
+
+                  <!-- Row 5: RF & Rad -->
+                  <div class="col-sm-4">
+                    <label class="form-label-tech">Signal Strength (dBm)</label>
+                    <input type="number" step="0.1" class="form-control form-control-tech val-mono" id="inputSignal" value="-74.0" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: -75 dBm</span>
+                  </div>
+                  <div class="col-sm-4">
+                    <label class="form-label-tech">Comm Status</label>
+                    <select class="form-select form-select-tech" id="inputCommStatus">
+                      <option value="1" selected>1 - Connected</option>
+                      <option value="0">0 - Lost Lock</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-4">
+                    <label class="form-label-tech">Radiation (rad/s)</label>
+                    <input type="number" step="0.001" class="form-control form-control-tech val-mono" id="inputRadiation" value="0.045" required>
+                    <span class="small text-secondary" style="font-size: 0.68rem;">Nominal: ~0.05</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 pt-2 border-top border-secondary border-opacity-25 d-flex gap-3">
+                  <button type="submit" class="btn btn-space-cyan flex-grow-1" id="predictBtn">
+                    <i class="fa-solid fa-microchip me-1"></i> Classify Telemetry Record
+                  </button>
+                  <button type="button" class="btn btn-space-outline" onclick="loadScenario('nominal')">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Diagnostic Results & Decision Support Column -->
+          <div class="col-lg-6">
+            <div class="space-card h-100">
+              <div class="card-header-styled">
+                <h3 class="card-title-styled">
+                  <i class="fa-solid fa-stethoscope text-info"></i> Diagnostic Output & Attribution
+                </h3>
+                <span class="badge bg-dark border border-secondary text-secondary" id="resultModelBadge">XGBoost</span>
+              </div>
+
+              <!-- Output Status Card -->
+              <div class="p-3 rounded-3 mb-4" id="predictionStatusBox" style="background: rgba(16, 185, 129, 0.12); border: 1px solid var(--color-normal-border);">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="pulse-dot pulse-dot-normal" id="resultPulseDot"></span>
+                    <h4 class="h5 mb-0 fw-bold" id="resultStatusText" style="color: #10b981;">TELEMETRY NORMAL</h4>
+                  </div>
+                  <span class="badge-status badge-normal" id="resultSeverityBadge">NORMAL</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between small text-secondary">
+                  <span>Category: <strong class="text-light" id="resultCategoryText">Normal</strong></span>
+                  <span>Model Confidence: <strong class="text-info val-mono" id="resultConfidenceText">99.8%</strong></span>
+                </div>
+              </div>
+
+              <!-- Explanatory Narrative -->
+              <div class="mb-4">
+                <div class="form-label-tech mb-1">
+                  <i class="fa-solid fa-comment-dots text-info me-1"></i> Indicative Explainability Narrative:
+                </div>
+                <div class="p-3 rounded-3" style="background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-subtle); font-size: 0.88rem; line-height: 1.5; color: #cbd5e1;" id="resultExplanationText">
+                  All ingested telemetry parameters remain within verified nominal operating bounds.
+                </div>
+              </div>
+
+              <!-- Top Contributing Features -->
+              <div class="mb-4" id="contributingFeaturesContainer" style="display: none;">
+                <div class="form-label-tech mb-2">
+                  <i class="fa-solid fa-chart-column text-info me-1"></i> Top Contributing Anomaly Indicators:
+                </div>
+                <div id="contributingFeaturesBars">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Decision Support Box -->
+              <div class="decision-support-box mt-auto">
+                <div class="decision-support-badge">
+                  <i class="fa-solid fa-clipboard-check"></i> Rule-Based Decision Support Guidance
+                </div>
+                <h5 class="h6 text-light mb-2" id="decisionSupportTitle">
+                  Nominal Orbital Operations
+                </h5>
+                <div id="decisionSupportList" class="mb-2">
+                  <div class="decision-action-item">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>Maintain standard orbital tracking and telemetry polling cadence (10s intervals).</span>
+                  </div>
+                  <div class="decision-action-item">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>Routine background health log archival.</span>
+                  </div>
+                  <div class="decision-action-item">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>No subsystem intervention required.</span>
+                  </div>
+                </div>
+                <div class="small text-secondary" style="font-size: 0.68rem;">
+                  <i class="fa-solid fa-shield-halved me-1"></i> Operator advisory checklist generated via rule table. Not autonomous spacecraft commands.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSV Batch Anomaly Prediction Section -->
+        <div class="space-card mt-4">
+          <div class="card-header-styled">
+            <h3 class="card-title-styled">
+              <i class="fa-solid fa-file-csv text-info"></i> Batch Anomaly Classification via CSV
+            </h3>
+            <span class="small text-secondary">High-Throughput Offline Inference</span>
+          </div>
+          <div class="row align-items-center g-3">
+            <div class="col-md-8">
+              <input type="file" id="batchCsvInput" class="form-control form-control-tech" accept=".csv">
+              <span class="small text-secondary">Upload a CSV file with satellite telemetry rows to classify anomalies at scale.</span>
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-space-cyan w-100" onclick="handleBatchPrediction()">
+                <i class="fa-solid fa-bolt me-1"></i> Run Batch Prediction
+              </button>
+            </div>
+          </div>
+
+          <div id="batchResultsContainer" class="mt-4" style="display: none;">
+            <hr class="border-secondary border-opacity-25 mb-4">
+            <div class="row g-3 mb-3 text-center">
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3" style="background: rgba(0, 0, 0, 0.3);">
+                  <div class="small text-secondary">Total Processed</div>
+                  <div class="h4 val-mono text-light mb-0" id="batchTotal">0</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3" style="background: rgba(0, 0, 0, 0.3);">
+                  <div class="small text-secondary">Anomalies Detected</div>
+                  <div class="h4 val-mono text-warning mb-0" id="batchAnomCount">0</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="p-3 rounded-3" style="background: rgba(0, 0, 0, 0.3);">
+                  <div class="small text-secondary">Anomaly Ratio</div>
+                  <div class="h4 val-mono text-danger mb-0" id="batchAnomRate">0%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Table -->
+            <div class="table-responsive">
+              <table class="table-space">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Predicted Status</th>
+                    <th>Anomaly Category</th>
+                    <th>Confidence</th>
+                    <th>Bat V</th>
+                    <th>Temp</th>
+                    <th>Power</th>
+                  </tr>
+                </thead>
+                <tbody id="batchPreviewBody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script>
+    // Scenario Presets
+    const scenarios = {
+      nominal: {
+        battery_voltage: 28.2, battery_current: 3.5, temperature: 22.0, cpu_subsystem_temp: 36.5,
+        solar_panel_voltage: 48.0, solar_panel_current: 6.5, power_consumption: 195.0,
+        pressure: 101.3, signal_strength: -74.0, comm_status: 1, radiation_level: 0.045
+      },
+      thermal: {
+        battery_voltage: 27.9, battery_current: 3.6, temperature: 68.5, cpu_subsystem_temp: 79.2,
+        solar_panel_voltage: 48.0, solar_panel_current: 6.5, power_consumption: 240.0,
+        pressure: 101.2, signal_strength: -75.0, comm_status: 1, radiation_level: 0.05
+      },
+      battery: {
+        battery_voltage: 21.4, battery_current: 8.8, temperature: 26.5, cpu_subsystem_temp: 40.0,
+        solar_panel_voltage: 36.0, solar_panel_current: 4.0, power_consumption: 250.0,
+        pressure: 101.1, signal_strength: -78.0, comm_status: 1, radiation_level: 0.045
+      },
+      comm: {
+        battery_voltage: 28.0, battery_current: 3.4, temperature: 22.5, cpu_subsystem_temp: 37.0,
+        solar_panel_voltage: 48.0, solar_panel_current: 6.5, power_consumption: 190.0,
+        pressure: 101.3, signal_strength: -115.0, comm_status: 0, radiation_level: 0.048
+      },
+      sensor: {
+        battery_voltage: 28.1, battery_current: 3.5, temperature: 23.0, cpu_subsystem_temp: 38.0,
+        solar_panel_voltage: 48.0, solar_panel_current: 6.5, power_consumption: 195.0,
+        pressure: 64.2, signal_strength: -74.5, comm_status: 1, radiation_level: 0.045
+      },
+      solar_storm: {
+        battery_voltage: 24.5, battery_current: 5.2, temperature: 48.0, cpu_subsystem_temp: 62.0,
+        solar_panel_voltage: 42.0, solar_panel_current: 5.0, power_consumption: 290.0,
+        pressure: 100.8, signal_strength: -98.0, comm_status: 1, radiation_level: 1.85
+      }
+    };
+
+    function loadScenario(key) {
+      const s = scenarios[key];
+      if (!s) return;
+      document.getElementById('inputBatV').value = s.battery_voltage;
+      document.getElementById('inputBatI').value = s.battery_current;
+      document.getElementById('inputTemp').value = s.temperature;
+      document.getElementById('inputCpuTemp').value = s.cpu_subsystem_temp;
+      document.getElementById('inputSolarV').value = s.solar_panel_voltage;
+      document.getElementById('inputSolarI').value = s.solar_panel_current;
+      document.getElementById('inputPower').value = s.power_consumption;
+      document.getElementById('inputPressure').value = s.pressure;
+      document.getElementById('inputSignal').value = s.signal_strength;
+      document.getElementById('inputCommStatus').value = s.comm_status;
+      document.getElementById('inputRadiation').value = s.radiation_level;
+
+      // Auto-trigger prediction
+      document.getElementById('anomalyPredictionForm').dispatchEvent(new Event('submit'));
+    }
+
+    async function handleSinglePrediction(e) {
+      e.preventDefault();
+      const model = document.getElementById('inferenceModelSelect').value;
+      const predictBtn = document.getElementById('predictBtn');
+      predictBtn.disabled = true;
+      predictBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Running Classifier...';
+
+      const telemetry = {
+        battery_voltage: parseFloat(document.getElementById('inputBatV').value),
+        battery_current: parseFloat(document.getElementById('inputBatI').value),
+        temperature: parseFloat(document.getElementById('inputTemp').value),
+        cpu_subsystem_temp: parseFloat(document.getElementById('inputCpuTemp').value),
+        solar_panel_voltage: parseFloat(document.getElementById('inputSolarV').value),
+        solar_panel_current: parseFloat(document.getElementById('inputSolarI').value),
+        power_consumption: parseFloat(document.getElementById('inputPower').value),
+        pressure: parseFloat(document.getElementById('inputPressure').value),
+        signal_strength: parseFloat(document.getElementById('inputSignal').value),
+        comm_status: parseInt(document.getElementById('inputCommStatus').value),
+        radiation_level: parseFloat(document.getElementById('inputRadiation').value)
+      };
+
+      const res = await SpaceGuardAPI.predictSingle(telemetry, model, true);
+      predictBtn.disabled = false;
+      predictBtn.innerHTML = '<i class="fa-solid fa-microchip me-1"></i> Classify Telemetry Record';
+
+      if (res.status === 'success' && res.result) {
+        displayPredictionResult(res.result);
+      } else {
+        alert('Prediction failed: ' + (res.message || 'Unknown error'));
+      }
+    }
+
+    function displayPredictionResult(r) {
+      document.getElementById('resultModelBadge').textContent = r.model_used;
+      const isAnom = r.status === 'Anomaly';
+      const sev = r.severity.toLowerCase();
+
+      // Status Box Styling
+      const statusBox = document.getElementById('predictionStatusBox');
+      const pulseDot = document.getElementById('resultPulseDot');
+      const statusText = document.getElementById('resultStatusText');
+      const sevBadge = document.getElementById('resultSeverityBadge');
+
+      sevBadge.className = `badge-status badge-${sev}`;
+      sevBadge.textContent = r.severity;
+      pulseDot.className = `pulse-dot pulse-dot-${sev}`;
+
+      if (r.severity === 'Critical') {
+        statusBox.style.background = 'rgba(239, 68, 68, 0.16)';
+        statusBox.style.borderColor = 'rgba(239, 68, 68, 0.45)';
+        statusText.style.color = '#ef4444';
+        statusText.textContent = `CRITICAL ANOMALY DETECTED`;
+      } else if (r.severity === 'Warning') {
+        statusBox.style.background = 'rgba(245, 158, 11, 0.16)';
+        statusBox.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        statusText.style.color = '#f59e0b';
+        statusText.textContent = `WARNING: TELEMETRY OUT OF BOUNDS`;
+      } else {
+        statusBox.style.background = 'rgba(16, 185, 129, 0.12)';
+        statusBox.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        statusText.style.color = '#10b981';
+        statusText.textContent = `TELEMETRY NORMAL`;
+      }
+
+      document.getElementById('resultCategoryText').textContent = r.anomaly_type;
+      document.getElementById('resultConfidenceText').textContent = `${(r.confidence * 100).toFixed(1)}%`;
+      document.getElementById('resultExplanationText').textContent = r.explanation;
+
+      // Contributing Features
+      const featContainer = document.getElementById('contributingFeaturesContainer');
+      const featBars = document.getElementById('contributingFeaturesBars');
+
+      if (r.contributing_features && r.contributing_features.length > 0 && isAnom) {
+        featContainer.style.display = 'block';
+        const maxScore = Math.max(...r.contributing_features.map(f => f.score), 1.0);
+        featBars.innerHTML = r.contributing_features.map(f => {
+          const pct = Math.min(100, Math.round((f.score / maxScore) * 100));
+          return `
+            <div class="fi-bar-container">
+              <div class="fi-bar-label">
+                <span><strong>${f.feature.replace(/_/g, ' ')}</strong>: ${f.value} ${f.unit} (Nominal: ${f.nominal})</span>
+                <span class="val-mono text-info">Z: ${f.z_score}</span>
+              </div>
+              <div class="fi-bar-track">
+                <div class="fi-bar-fill" style="width: ${pct}%;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        featContainer.style.display = 'none';
+      }
+
+      // Decision Support
+      const ds = r.decision_support;
+      if (ds) {
+        document.getElementById('decisionSupportTitle').textContent = ds.summary || 'Advisory Protocol:';
+        const actionsList = document.getElementById('decisionSupportList');
+        if (ds.actions && ds.actions.length > 0) {
+          actionsList.innerHTML = ds.actions.map(act => `
+            <div class="decision-action-item">
+              <i class="fa-solid fa-arrow-right"></i>
+              <span>${act}</span>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    async function handleBatchPrediction() {
+      const fileInput = document.getElementById('batchCsvInput');
+      if (!fileInput.files.length) {
+        alert('Please select a CSV file first.');
+        return;
+      }
+
+      const res = await SpaceGuardAPI.predictBatch(fileInput.files[0], 'XGBoost');
+      if (res.status !== 'success') {
+        alert('Batch prediction failed: ' + (res.message || 'Error'));
+        return;
+      }
+
+      document.getElementById('batchResultsContainer').style.display = 'block';
+      document.getElementById('batchTotal').textContent = res.total_records.toLocaleString();
+      document.getElementById('batchAnomCount').textContent = res.anomalies_detected.toLocaleString();
+      document.getElementById('batchAnomRate').textContent = `${res.anomaly_rate}%`;
+
+      const previewBody = document.getElementById('batchPreviewBody');
+      if (res.preview && res.preview.length > 0) {
+        previewBody.innerHTML = res.preview.map(r => {
+          const isA = r.predicted_status === 'Anomaly';
+          const badge = isA
+            ? `<span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25">ANOMALY</span>`
+            : `<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">NORMAL</span>`;
+
+          return `
+            <tr>
+              <td class="val-mono text-secondary">${r.timestamp || '--'}</td>
+              <td>${badge}</td>
+              <td class="fw-bold text-light">${r.predicted_type}</td>
+              <td class="val-mono text-info">${(r.confidence * 100).toFixed(1)}%</td>
+              <td class="val-mono">${r.battery_voltage} V</td>
+              <td class="val-mono">${r.temperature} °C</td>
+              <td class="val-mono">${r.power_consumption} W</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+  </script>
+</body>
+</html>

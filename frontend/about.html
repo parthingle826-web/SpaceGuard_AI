@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Architecture & Methodology – SpaceGuard AI</title>
+  <meta name="description" content="Academic methodology, system architecture, telemetry parameter specifications, and ML evaluation criteria for SpaceGuard AI.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Academic Disclaimer Banner -->
+  <div class="academic-disclaimer-banner">
+    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+    <strong>ACADEMIC RESEARCH PROJECT:</strong> Developed as an academic simulation & decision-support system. All telemetry data is synthetic and <strong>NOT real NASA/mission data</strong>.
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo-icon">
+          <i class="fa-solid fa-satellite"></i>
+        </div>
+        <div>
+          <h1 class="sidebar-brand-title">SPACEGUARD</h1>
+          <p class="sidebar-brand-sub">AI TELEMETRY OPS</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="/" class="nav-link-item">
+          <i class="fa-solid fa-compass"></i>
+          <span>Mission Overview</span>
+        </a>
+        <a href="/dashboard" class="nav-link-item">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Mission Control</span>
+        </a>
+        <a href="/telemetry" class="nav-link-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Telemetry Stream</span>
+        </a>
+        <a href="/anomaly" class="nav-link-item">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Anomaly Lab</span>
+        </a>
+        <a href="/models" class="nav-link-item">
+          <i class="fa-solid fa-brain"></i>
+          <span>ML Model Benchmarks</span>
+        </a>
+        <a href="/history" class="nav-link-item">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Incident History</span>
+        </a>
+        <a href="/about" class="nav-link-item active">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Architecture & Docs</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-status-box">
+          <div class="small text-secondary" style="font-size: 0.72rem;">PROJECT TYPE</div>
+          <div class="fw-bold text-info" style="font-size: 0.8rem;">AIML Mini Project</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div>
+          <h2 class="topbar-title">SYSTEM ARCHITECTURE & METHODOLOGY</h2>
+          <span class="small text-secondary">IEEE-Structured Academic Documentation, Dataset Physics & ML Design</span>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <main class="content-body">
+        <!-- 1. Executive Summary & Problem Statement -->
+        <div class="space-card mb-4">
+          <div class="card-header-styled">
+            <h3 class="card-title-styled">
+              <i class="fa-solid fa-bullseye text-info"></i> 1. Problem Statement & Operational Context
+            </h3>
+            <span class="badge bg-primary bg-opacity-25 text-info">Mission Operations Context</span>
+          </div>
+          <p class="text-light" style="line-height: 1.6;">
+            Modern orbital spacecraft generate continuous high-frequency multi-subsystem telemetry spanning electrical power (EPS), thermal control (TCS), attitude determination and control (ADCS), telecommunications, and onboard computing (C&DH). In Low Earth Orbit (LEO), spacecraft experience rapid environmental transitions between direct solar exposure and deep eclipse every ~90 minutes, leading to cyclic thermal and electrical stress.
+          </p>
+          <p class="text-secondary" style="line-height: 1.6;">
+            Traditional ground operations rely heavily on static out-of-limits (OOFL) threshold alarms. These static thresholds often produce high false alarm rates during orbital transitions or fail to detect multivariate, subtle subsystem anomalies (such as sensor drift or compound cross-subsystem degradation). <strong>SpaceGuard AI</strong> addresses this limitation by deploying machine learning classifiers to distinguish genuine anomalies from nominal orbital fluctuations, compute individual feature attribution, and provide structured advisory decision support to human operators.
+          </p>
+        </div>
+
+        <!-- 2. System Architecture Diagram -->
+        <div class="space-card mb-4">
+          <div class="card-header-styled">
+            <h3 class="card-title-styled">
+              <i class="fa-solid fa-diagram-project text-info"></i> 2. Complete System Architecture
+            </h3>
+            <span class="badge bg-secondary bg-opacity-25 text-light">Layered Engineering Topology</span>
+          </div>
+          <div class="p-4 rounded-3 text-center" style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-subtle);">
+            <!-- Interactive SVG Architecture Diagram -->
+            <svg viewBox="0 0 900 320" style="max-width: 100%; height: auto;" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background Grid Lines -->
+              <defs>
+                <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#4facfe" stop-opacity="0.1"/>
+                </linearGradient>
+                <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#6366f1" stop-opacity="0.1"/>
+                </linearGradient>
+                <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#059669" stop-opacity="0.1"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Block 1: Telemetry Data Sources -->
+              <rect x="20" y="40" width="180" height="240" rx="10" fill="#0e1525" stroke="#00f2fe" stroke-width="1.5"/>
+              <text x="110" y="70" fill="#00f2fe" font-family="Orbitron" font-size="12" font-weight="bold" text-anchor="middle">DATA INGESTION</text>
+              <rect x="35" y="90" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="110" y="112" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">LEO Orbit Simulation</text>
+              <rect x="35" y="135" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="110" y="157" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">CSV Dataset Upload</text>
+              <rect x="35" y="180" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="110" y="202" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Real-Time Ingestion (10s)</text>
+              <rect x="35" y="225" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="110" y="247" fill="#94a3b8" font-family="Inter" font-size="10" text-anchor="middle">11 Sensor Channels</text>
+
+              <!-- Arrow 1 to 2 -->
+              <path d="M 200 160 L 250 160" stroke="#00f2fe" stroke-width="2" marker-end="url(#arrow)"/>
+              <polygon points="250,160 240,154 240,166" fill="#00f2fe"/>
+
+              <!-- Block 2: Preprocessing & Feature Engineering -->
+              <rect x="250" y="40" width="180" height="240" rx="10" fill="#0e1525" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="340" y="70" fill="#38bdf8" font-family="Orbitron" font-size="12" font-weight="bold" text-anchor="middle">PREPROCESSING</text>
+              <rect x="265" y="90" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="340" y="112" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Schema Validation</text>
+              <rect x="265" y="135" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="340" y="157" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Domain Feature Eng.</text>
+              <rect x="265" y="180" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="340" y="202" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Nominal Deviations (Δ)</text>
+              <rect x="265" y="225" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="340" y="247" fill="#94a3b8" font-family="Inter" font-size="10" text-anchor="middle">StandardScaler Normalization</text>
+
+              <!-- Arrow 2 to 3 -->
+              <path d="M 430 160 L 480 160" stroke="#38bdf8" stroke-width="2"/>
+              <polygon points="480,160 470,154 470,166" fill="#38bdf8"/>
+
+              <!-- Block 3: Machine Learning Engine -->
+              <rect x="480" y="40" width="180" height="240" rx="10" fill="#0e1525" stroke="#8b5cf6" stroke-width="1.5"/>
+              <text x="570" y="70" fill="#8b5cf6" font-family="Orbitron" font-size="12" font-weight="bold" text-anchor="middle">ML CLASSIFIERS</text>
+              <rect x="495" y="90" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="570" y="112" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Decision Tree (CART)</text>
+              <rect x="495" y="135" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="570" y="157" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Support Vector Machine</text>
+              <rect x="495" y="180" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="570" y="202" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">XGBoost (Softprob)</text>
+              <rect x="495" y="225" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="570" y="247" fill="#94a3b8" font-family="Inter" font-size="10" text-anchor="middle">MODEL_REGISTRY Interface</text>
+
+              <!-- Arrow 3 to 4 -->
+              <path d="M 660 160 L 710 160" stroke="#8b5cf6" stroke-width="2"/>
+              <polygon points="710,160 700,154 700,166" fill="#8b5cf6"/>
+
+              <!-- Block 4: Decision Support & UI -->
+              <rect x="710" y="40" width="170" height="240" rx="10" fill="#0e1525" stroke="#10b981" stroke-width="1.5"/>
+              <text x="795" y="70" fill="#10b981" font-family="Orbitron" font-size="12" font-weight="bold" text-anchor="middle">DECISION SUPPORT</text>
+              <rect x="720" y="90" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="795" y="112" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Feature Attribution</text>
+              <rect x="720" y="135" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="795" y="157" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">Advisory Rule Engine</text>
+              <rect x="720" y="180" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="795" y="202" fill="#e2e8f0" font-family="Inter" font-size="11" text-anchor="middle">SQLite Incident History</text>
+              <rect x="720" y="225" width="150" height="35" rx="6" fill="#141f37"/>
+              <text x="795" y="247" fill="#94a3b8" font-family="Inter" font-size="10" text-anchor="middle">Mission Control UI</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 3. Telemetry Parameter Specifications Table -->
+        <div class="space-card mb-4">
+          <div class="card-header-styled">
+            <h3 class="card-title-styled">
+              <i class="fa-solid fa-list-check text-info"></i> 3. Ingested Telemetry Features & Nominal Bounds
+            </h3>
+            <span class="small text-secondary">Subsystem Sensor Profiles</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table-space">
+              <thead>
+                <tr>
+                  <th>Parameter Channel</th>
+                  <th>Subsystem</th>
+                  <th>Unit</th>
+                  <th>Nominal Baseline</th>
+                  <th>Safe Operating Range</th>
+                  <th>Failure Significance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="val-mono text-light">battery_voltage</td>
+                  <td>EPS (Power)</td>
+                  <td>Volts (V)</td>
+                  <td class="val-mono text-success">28.0 V</td>
+                  <td class="val-mono">24.0 - 32.0 V</td>
+                  <td class="small text-secondary">Bus collapse risk, cell degradation, shunt short</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">battery_current</td>
+                  <td>EPS (Power)</td>
+                  <td>Amperes (A)</td>
+                  <td class="val-mono text-success">3.5 A</td>
+                  <td class="val-mono">1.0 - 8.0 A</td>
+                  <td class="small text-secondary">Overcurrent, latchup, excessive battery discharge</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">temperature</td>
+                  <td>TCS (Thermal)</td>
+                  <td>°Celsius</td>
+                  <td class="val-mono text-success">22.0 °C</td>
+                  <td class="val-mono">-10.0 - 50.0 °C</td>
+                  <td class="small text-secondary">Radiator degradation, thermal runaway, heater failure</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">cpu_subsystem_temp</td>
+                  <td>C&DH (Avionics)</td>
+                  <td>°Celsius</td>
+                  <td class="val-mono text-success">38.0 °C</td>
+                  <td class="val-mono">20.0 - 65.0 °C</td>
+                  <td class="small text-secondary">Processor throttling, silicon gate thermal stress</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">solar_panel_voltage</td>
+                  <td>EPS (Solar Array)</td>
+                  <td>Volts (V)</td>
+                  <td class="val-mono text-success">48.0 V (Sun)</td>
+                  <td class="val-mono">35.0 - 55.0 V</td>
+                  <td class="small text-secondary">Solar string failure, diode degradation, shadow blockage</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">solar_panel_current</td>
+                  <td>EPS (Solar Array)</td>
+                  <td>Amperes (A)</td>
+                  <td class="val-mono text-success">6.5 A (Sun)</td>
+                  <td class="val-mono">2.0 - 9.5 A</td>
+                  <td class="small text-secondary">Array pointing misalignment, cell micro-meteoroid impact</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">power_consumption</td>
+                  <td>EPS (Load)</td>
+                  <td>Watts (W)</td>
+                  <td class="val-mono text-success">200.0 W</td>
+                  <td class="val-mono">120.0 - 280.0 W</td>
+                  <td class="small text-secondary">Unintended payload activation, power overload</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">pressure</td>
+                  <td>Avionics Compartment</td>
+                  <td>kPa</td>
+                  <td class="val-mono text-success">101.3 kPa</td>
+                  <td class="val-mono">85.0 - 105.0 kPa</td>
+                  <td class="small text-secondary">Vessel seal breach, micro-fracture, sensor calibration drift</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">signal_strength</td>
+                  <td>TTC (Comms)</td>
+                  <td>dBm</td>
+                  <td class="val-mono text-success">-75.0 dBm</td>
+                  <td class="val-mono">-95.0 - -50.0 dBm</td>
+                  <td class="small text-secondary">Carrier attenuation, ADCS antenna pointing loss</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">comm_status</td>
+                  <td>TTC (Comms)</td>
+                  <td>Binary</td>
+                  <td class="val-mono text-success">1 (Locked)</td>
+                  <td class="val-mono">1</td>
+                  <td class="small text-secondary">Loss of telemetry beacon / ground station lock</td>
+                </tr>
+                <tr>
+                  <td class="val-mono text-light">radiation_level</td>
+                  <td>Space Environment</td>
+                  <td>rad/s</td>
+                  <td class="val-mono text-success">0.05 rad/s</td>
+                  <td class="val-mono">0.01 - 0.30 rad/s</td>
+                  <td class="small text-secondary">Solar particle events (SPE), South Atlantic Anomaly (SAA)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. ML Models & Preprocessing Methodology -->
+        <div class="space-card mb-4">
+          <div class="card-header-styled">
+            <h3 class="card-title-styled">
+              <i class="fa-solid fa-microchip text-info"></i> 4. Machine Learning Methodology & Extensibility
+            </h3>
+            <span class="badge bg-primary bg-opacity-25 text-info">Comparative ML Study</span>
+          </div>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="p-3 rounded-3 h-100" style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-subtle);">
+                <h4 class="h6 text-light fw-bold"><i class="fa-solid fa-tree text-success me-1"></i> Decision Tree (CART)</h4>
+                <p class="small text-secondary mb-0">
+                  Employs recursive binary splitting optimized via Gini impurity. Provides inherent interpretability through decision paths and direct computation of global feature importances (<span class="val-mono text-info">feature_importances_</span>).
+                </p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 rounded-3 h-100" style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-subtle);">
+                <h4 class="h6 text-light fw-bold"><i class="fa-solid fa-shapes text-warning me-1"></i> Support Vector Machine</h4>
+                <p class="small text-secondary mb-0">
+                  Constructs optimal separating hyperplanes in high-dimensional reproducing kernel Hilbert spaces (RBF kernel). Highly effective for isolating non-linear anomaly boundaries. Platt scaling provides calibrated class probabilities.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 rounded-3 h-100" style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-subtle);">
+                <h4 class="h6 text-light fw-bold"><i class="fa-solid fa-bolt text-info me-1"></i> XGBoost (Gradient Boosted)</h4>
+                <p class="small text-secondary mb-0">
+                  Sequential ensemble utilizing second-order Taylor expansion loss gradients and L1/L2 tree regularization. Delivers state-of-the-art multi-class classification accuracy and resilient resistance to telemetry noise.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="p-3 rounded-3 mt-3" style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3);">
+            <div class="fw-bold text-light small mb-1"><i class="fa-solid fa-puzzle-piece text-info me-1"></i> Extensible Architecture Design (MODEL_REGISTRY):</div>
+            <p class="small text-secondary mb-0">
+              The machine learning pipeline implements a unified <span class="val-mono text-info">MODEL_REGISTRY</span> dictionary interface. Adding a fourth classifier (such as Random Forest, Logistic Regression, or LightGBM) requires only a single configuration entry in <span class="val-mono">backend/ml/train_models.py</span> without altering evaluation, caching, or inference logic.
+            </p>
+          </div>
+        </div>
+
+        <!-- 5. Academic References & IEEE Format Citation -->
+        <div class="space-card">
+          <div class="card-header-styled">
+            <h3 class="card-title-styled">
+              <i class="fa-solid fa-book text-info"></i> 5. Academic References & Citations
+            </h3>
+            <span class="small text-secondary">IEEE Format</span>
+          </div>
+          <ol class="small text-secondary ps-3 mb-0" style="line-height: 1.8;">
+            <li>K. Hundman, V. Constantinou, C. Laporte, I. Colwell, and T. Soderstrom, "Detecting Spacecraft Anomalies Using LSTMs and Nonparametric Dynamic Thresholding," in <em>Proc. 24th ACM SIGKDD Int. Conf. Knowledge Discovery & Data Mining</em>, 2018, pp. 387–395.</li>
+            <li>T. Yairi, N. Takeishi, T. Oda, Y. Yano, R. Sakuma, et al., "A Data-Driven Health Monitoring System for Spacecraft Telemetry: Anomaly Detection, Failure Analysis, and Degradation Prognosis," in <em>IEEE Aerospace Conference</em>, Big Sky, MT, 2017, pp. 1–14.</li>
+            <li>T. Chen and C. Guestrin, "XGBoost: A Scalable Tree Boosting System," in <em>Proc. 22nd ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining</em>, 2016, pp. 785–794.</li>
+            <li>C. Cortes and V. Vapnik, "Support-Vector Networks," <em>Machine Learning</em>, vol. 20, no. 3, pp. 273–297, 1995.</li>
+            <li>L. Breiman, J. Friedman, R. Olshen, and C. Stone, <em>Classification and Regression Trees</em>, Belmont, CA: Wadsworth International Group, 1984.</li>
+          </ol>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
