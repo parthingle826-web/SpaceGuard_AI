@@ -1,8 +1,4 @@
-"""
-SpaceGuard AI - Flask REST API & Web Server
-Satellite Telemetry Anomaly Detection and Decision Support System
-NOTE: Academic simulation only - Not real NASA/spacecraft mission data.
-"""
+
 
 import os
 import sys
@@ -14,14 +10,13 @@ import logging
 import threading
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple, List
 
 import pandas as pd
 import numpy as np
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 
-# Add root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from backend.config import (
